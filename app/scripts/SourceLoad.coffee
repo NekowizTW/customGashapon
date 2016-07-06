@@ -7,7 +7,7 @@ SourceLoad =
   data: {}
   base: '19i6BNjbgtZieTxl-QDgYW1nXlOEd4FF7VTtsEF7vMXI'
   urls: [
-    'http://spreadsheets.google.com/feeds/list/'
+    'https://spreadsheets.google.com/feeds/list/'
     '/1/public/basic?alt=json'
     '/2/public/basic?alt=json'
   ]
