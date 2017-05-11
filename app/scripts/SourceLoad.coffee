@@ -3,7 +3,7 @@ url = require('url')
 location = require('location-href')
 Console = require('console-browserify')
 
-SourceLoad = 
+SourceLoad =
   data: {}
   base: '19i6BNjbgtZieTxl-QDgYW1nXlOEd4FF7VTtsEF7vMXI'
   urls: [
@@ -27,52 +27,47 @@ SourceLoad =
       r.send()
     )
     return promise
-  sortList: (source) ->
+  commonList: (source) ->
     table = source.feed.entry
-    res = {}
+    res = []
+    if table == undefined
+      return res
     table.forEach((card) ->
-      if not res[card.content.$t.split("稀有度: ")[1]]
-        res[card.content.$t.split("稀有度: ")[1]] = []
-      res[card.content.$t.split("稀有度: ")[1]].push(card.title.$t)
+      newCard = {}
+      card.content.$t.split(", ").forEach((item) ->
+        info = item.split(": ")
+        newCard[info[0]] = info[1]
+      )
+      res.push newCard
     )
     return res
-  probList: (source) ->
+  specialList: (source) ->
     table = source.feed.entry
-    res = 
-      baseProb: 
-        key: []
-        prob: []
-      subProb: {}
-    table[0].content.$t.split(",").forEach((str) ->
-      prob = str.split(":")
-      res.baseProb.prob.push(prob[1].trim())
-    )
-    table[1].content.$t.split(",").forEach((str) ->
-      prob = str.split(":")
-      res.baseProb.key.push(prob[1].trim())
-      res.subProb[prob[1].trim()] = []
-    )
-    for i in [2..table.length-1]
-      j = 0
-      table[i].content.$t.split(",").forEach((str) ->
-        prob = str.split(":")
-        res.subProb[res.baseProb.key[j]].push(prob[1].trim())
-        j++
+    res = []
+    if table == undefined
+      return res
+    table.forEach((card) ->
+      newCard = {}
+      card.content.$t.split(", ").forEach((item) ->
+        info = item.split(": ")
+        newCard[info[0]] = info[1]
       )
+      res.push newCard
+    )
     return res
   init: (f) ->
     url_parse = url.parse(location(), true)
     id = url_parse.query.id || @base
-    promises = 
-      prob: @getJSON(@urls[0]+id+@urls[1])
+    promises =
+      special: @getJSON(@urls[0]+id+@urls[1])
       list: @getJSON(@urls[0]+id+@urls[2])
-    func = 
-      sortList: @sortList
-      probList: @probList
+    func =
+      commonList: @commonList
+      specialList: @specialList
     RSVP.hash(promises).then((result) ->
-      @data = 
-        list: func.sortList(result.list)
-        prob: func.probList(result.prob)
+      @data = {}
+      @data.commonList = func.commonList(result.list)
+      @data.specialList =  func.specialList(result.special)
       f(@data)
     ).catch((error) ->
       Console.log "WTF"
