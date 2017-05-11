@@ -31,3 +31,17 @@ body {
   width: 50px;
   height: auto;
 }
+
+.flex {
+  display: block;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+@media screen and (min-width: 768px) {
+  .flex {
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
